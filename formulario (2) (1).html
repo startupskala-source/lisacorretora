@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consultoria Personalizada</title>
+
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1522761929449377');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1522761929449377&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --blue:#2563EB;
+  --blue-l:#EFF6FF;
+  --blue-d:#1D4ED8;
+  --text:#111827;
+  --muted:#9CA3AF;
+  --border:#E5E7EB;
+  --red:#EF4444;
+  --green:#16A34A;
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+
+body{
+  font-family:'Sora',sans-serif;
+  background:#fff;
+  color:var(--text);
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:24px 16px 64px;
+  overflow-x:hidden;
+}
+
+/* PROGRESS */
+.pbar{
+  position:fixed;top:0;left:0;
+  height:3px;
+  background:linear-gradient(90deg,var(--blue),#60A5FA);
+  width:0%;
+  transition:width .55s var(--ease);
+  z-index:100;
+  border-radius:0 2px 2px 0;
+}
+.step-ct{
+  position:fixed;top:16px;right:18px;
+  font-size:.76rem;font-weight:600;
+  color:var(--muted);letter-spacing:.06em;
+  opacity:0;transition:opacity .3s;
+}
+.step-ct.on{opacity:1}
+
+/* WRAP */
+.fw{width:100%;max-width:600px;position:relative;min-height:280px}
+
+/* SLIDES */
+.slide{
+  position:absolute;width:100%;top:0;left:0;
+  opacity:0;pointer-events:none;
+  transform:translateX(50px);
+}
+.slide.active{
+  position:relative;
+  opacity:1;pointer-events:all;
+  transform:translateX(0);
+  transition:opacity .38s var(--ease),transform .38s var(--ease);
+}
+.slide.out-l{
+  opacity:0;transform:translateX(-50px);
+  transition:opacity .28s var(--ease),transform .28s var(--ease);
+}
+
+/* LABEL */
+.lbl{
+  font-size:.74rem;font-weight:700;color:var(--blue);
+  letter-spacing:.1em;text-transform:uppercase;
+  margin-bottom:14px;display:flex;align-items:center;gap:8px;
+}
+.lbl::after{content:'';flex:1;height:1px;background:var(--blue-l);max-width:36px}
+
+/* TITLE + SUB */
+.ttl{
+  font-size:clamp(1.4rem,4vw,1.95rem);font-weight:700;
+  line-height:1.22;letter-spacing:-.4px;margin-bottom:10px;
+}
+.sub{font-size:.94rem;color:#6B7280;line-height:1.65;margin-bottom:30px}
+
+/* INPUT */
+.iw{position:relative;margin-bottom:4px}
+.il{
+  width:100%;border:none;
+  border-bottom:2px solid var(--border);
+  outline:none;
+  font-family:'Sora',sans-serif;font-size:1.15rem;
+  color:var(--blue);padding:6px 0 11px;
+  background:transparent;
+  transition:border-color .22s var(--ease);
+  caret-color:var(--blue);display:block;
+}
+.il::placeholder{color:#D1D5DB}
+.il:focus{border-bottom-color:var(--blue)}
+.il.err{border-bottom-color:var(--red)!important}
+.cur{
+  position:absolute;bottom:11px;right:0;
+  width:2px;height:18px;background:var(--blue);
+  border-radius:1px;animation:blink 1s step-end infinite;
+  opacity:0;transition:opacity .2s;
+}
+.il:focus~.cur{opacity:1}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.cc{
+  position:absolute;right:0;bottom:-20px;
+  font-size:.7rem;color:var(--muted);transition:color .2s;
+}
+.cc.warn{color:var(--red)}
+.emsg{
+  font-size:.75rem;color:var(--red);
+  margin-top:6px;max-height:0;overflow:hidden;
+  opacity:0;transition:max-height .2s,opacity .2s;
+}
+.emsg.on{max-height:24px;opacity:1}
+
+/* OPTIONS */
+.og{display:flex;flex-direction:column;gap:10px;margin-bottom:8px}
+.ob{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 18px;border:2px solid var(--border);
+  border-radius:12px;background:#fff;cursor:pointer;
+  font-family:'Sora',sans-serif;font-size:.95rem;font-weight:500;
+  color:var(--text);text-align:left;
+  transition:border-color .18s,background .18s,color .18s,transform .15s,box-shadow .18s;
+  user-select:none;position:relative;overflow:hidden;
+}
+.ob::before{display:none}
+.ob:hover{border-color:var(--blue);color:var(--blue);transform:translateX(4px);background:var(--blue-l)}
+.ob:active{transform:translateX(2px) scale(.99)}
+.ob.sel{
+  border-color:var(--blue);background:var(--blue-l);
+  color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.08);
+}
+.ok{
+  position:relative;z-index:1;
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:27px;height:27px;border-radius:7px;
+  background:var(--border);font-size:.7rem;font-weight:700;
+  color:#6B7280;transition:background .18s,color .18s;flex-shrink:0;
+}
+.ob:hover .ok,.ob.sel .ok{background:var(--blue);color:#fff}
+.ock{
+  margin-left:auto;opacity:0;transform:scale(0);
+  transition:all .22s var(--ease);color:var(--blue);
+  position:relative;z-index:1;
+}
+.ob.sel .ock{opacity:1;transform:scale(1)}
+
+/* BUTTONS */
+.bp{
+  display:inline-flex;align-items:center;gap:9px;
+  background:var(--blue);color:#fff;border:none;border-radius:10px;
+  padding:14px 24px;
+  font-family:'Sora',sans-serif;font-size:.95rem;font-weight:600;
+  cursor:pointer;margin-top:24px;
+  transition:background .2s,transform .18s,box-shadow .2s;
+  box-shadow:0 4px 14px rgba(37,99,235,.28);
+  position:relative;overflow:hidden;
+}
+.bp:hover{background:var(--blue-d);transform:translateY(-2px);box-shadow:0 7px 20px rgba(37,99,235,.35)}
+.bp:active{transform:translateY(0) scale(.98)}
+.bp .ar{transition:transform .2s var(--ease)}
+.bp:hover .ar{transform:translateX(4px)}
+.bk{
+  background:none;border:none;color:var(--muted);
+  font-family:'Sora',sans-serif;font-size:.86rem;cursor:pointer;
+  padding:8px 4px;display:inline-flex;align-items:center;gap:5px;
+  transition:color .2s;margin-top:24px;margin-left:10px;
+}
+.bk:hover{color:var(--text)}
+
+/* HINT */
+.hint{font-size:.73rem;color:#C9CDD6;margin-top:10px;display:flex;align-items:center;gap:4px}
+.hint kbd{
+  background:#F3F4F6;border:1px solid var(--border);
+  border-radius:4px;padding:1px 5px;
+  font-family:'Sora',sans-serif;font-size:.7rem;color:#9CA3AF;
+}
+
+/* SUCCESS */
+.sw{text-align:center;padding:10px 0}
+.si{
+  width:66px;height:66px;background:#DCFCE7;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;
+  animation:popIn .5s var(--ease) both;
+}
+@keyframes popIn{from{transform:scale(0) rotate(-15deg);opacity:0}to{transform:scale(1);opacity:1}}
+.st{font-size:1.7rem;font-weight:700;letter-spacing:-.3px;margin-bottom:12px;animation:fu .45s .15s var(--ease) both}
+.ss{color:#6B7280;font-size:.94rem;line-height:1.65;animation:fu .45s .25s var(--ease) both}
+@keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* CONFETTI */
+.cf{position:fixed;border-radius:2px;animation:cff linear forwards;pointer-events:none;z-index:999}
+@keyframes cff{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:0}}
+
+/* WHATSAPP BTN GLASS */
+#bwpp{
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 40%, #166534 100%);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 16px;
+  padding: 16px 30px;
+  box-shadow:
+    0 8px 32px rgba(22,163,74,.45),
+    0 2px 8px rgba(22,163,74,.3),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+  transition: transform .2s var(--ease), box-shadow .2s var(--ease), filter .2s;
+  font-size: 1rem;
+  letter-spacing: .01em;
+}
+#bwpp:hover{
+  transform: translateY(-3px) scale(1.02);
+  box-shadow:
+    0 16px 48px rgba(22,163,74,.55),
+    0 4px 16px rgba(22,163,74,.4),
+    inset 0 1px 0 rgba(255,255,255,0.25);
+  filter: brightness(1.08);
+}
+#bwpp:active{ transform: translateY(-1px) scale(.99); }
+
+/* camada de vidro fosco por cima */
+.bwpp-glass{
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    160deg,
+    rgba(255,255,255,0.18) 0%,
+    rgba(255,255,255,0.06) 40%,
+    rgba(255,255,255,0.0) 60%,
+    rgba(255,255,255,0.10) 100%
+  );
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* faixa de brilho em movimento infinito */
+.bwpp-shine{
+  position: absolute;
+  top: -60%; left: -80%;
+  width: 55%; height: 220%;
+  background: linear-gradient(
+    105deg,
+    rgba(255,255,255,0) 30%,
+    rgba(255,255,255,0.38) 50%,
+    rgba(255,255,255,0) 70%
+  );
+  transform: skewX(-18deg);
+  animation: wppShine 2.8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+@keyframes wppShine{
+  0%   { left: -80%; opacity: 0; }
+  10%  { opacity: 1; }
+  55%  { left: 130%; opacity: 1; }
+  56%  { opacity: 0; }
+  100% { left: 130%; opacity: 0; }
+}
+
+/* conteúdo acima das camadas */
+.bwpp-inner{
+  position: relative; z-index: 3;
+  display: inline-flex; align-items: center; gap: 9px;
+}
+
+/* pulso verde ao redor */
+#bwpp::after{
+  content: '';
+  position: absolute; inset: -3px;
+  border-radius: 19px;
+  background: transparent;
+  border: 2px solid rgba(22,163,74,0);
+  animation: wppPulse 2.8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes wppPulse{
+  0%,100%{ box-shadow: 0 0 0 0 rgba(22,163,74,.5); border-color: rgba(22,163,74,.0); }
+  50%    { box-shadow: 0 0 0 10px rgba(22,163,74,.0); border-color: rgba(22,163,74,.35); }
+}
+
+@media(max-width:480px){
+  .ttl{font-size:1.3rem}
+  .il{font-size:1.02rem}
+  .ob{font-size:.88rem;padding:12px 14px}
+}
+</style>
+</head>
+<body>
+
+<div class="pbar" id="pbar"></div>
+<div class="step-ct" id="sct"></div>
+
+<div class="fw" id="fw">
+
+  <!-- 0 · Boas-vindas -->
+  <div class="slide active" id="s0">
+    <div class="lbl">🌊 Lançamento Exclusivo</div>
+    <h1 class="ttl">Preparei um material completo com plantas, valores e as melhores unidades deste empreendimento.</h1>
+    <p class="sub">
+      Com condições facilitadas — apenas <strong>5% de entrada + 72x</strong> — as unidades com vista para o mar estão sendo reservadas rapidamente. 🌊<br><br>
+      Preencha os campos e receba uma consultoria personalizada para garantir sua oportunidade antes da abertura geral do mercado.
+    </p>
+    <button class="bp" id="b0">
+      Começar
+      <svg class="ar" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+
+  <!-- 1 · Nome -->
+  <div class="slide" id="s1">
+    <div class="lbl">Passo 1 de 5</div>
+    <h2 class="ttl">Como você gostaria de ser chamado(a) na nossa consultoria personalizada?</h2>
+    <p class="sub">Vamos deixar tudo mais pessoal 😊</p>
+    <div class="iw">
+      <input class="il" id="fnome" type="text" placeholder="Sua resposta..." autocomplete="given-name" maxlength="60">
+      <div class="cur"></div>
+      <span class="cc" id="ncc">0/60</span>
+    </div>
+    <div class="emsg" id="enome">Por favor, diga como podemos te chamar.</div>
+    <div>
+      <button class="bp" id="b1">OK <svg class="ar" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+      <button class="bk" id="bk1"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Voltar</button>
+    </div>
+    <p class="hint">Pressione <kbd>Enter ↵</kbd> para continuar</p>
+  </div>
+
+  <!-- 2 · WhatsApp -->
+  <div class="slide" id="s2">
+    <div class="lbl">Passo 2 de 5</div>
+    <h2 class="ttl">Qual o seu melhor número de WhatsApp para recebermos o vídeo da vista real do empreendimento e o agendamento da sua visita?</h2>
+    <p class="sub">Vamos te enviar o material completo por lá 📲</p>
+    <div class="iw">
+      <input class="il" id="fwpp" type="tel" placeholder="(00) 00000-0000" autocomplete="tel" maxlength="16">
+      <div class="cur"></div>
+    </div>
+    <div class="emsg" id="ewpp">Informe um número válido com DDD.</div>
+    <div>
+      <button class="bp" id="b2">OK <svg class="ar" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+      <button class="bk" id="bk2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Voltar</button>
+    </div>
+    <p class="hint">Pressione <kbd>Enter ↵</kbd> para continuar</p>
+  </div>
+
+  <!-- 3 · Objetivo -->
+  <div class="slide" id="s3">
+    <div class="lbl">Passo 3 de 5</div>
+    <h2 class="ttl">Qual é o seu principal objetivo com este imóvel:</h2>
+    <p class="sub">Isso nos ajuda a encontrar a unidade ideal para você.</p>
+    <div class="og" id="og3">
+      <button class="ob" data-v="moradia_exclusiva"><span class="ok">A</span>Moradia exclusiva<svg class="ock" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+      <button class="ob" data-v="investimento_rentabilidade"><span class="ok">B</span>Investimento com alta rentabilidade<svg class="ock" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+    </div>
+    <button class="bk" id="bk3"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Voltar</button>
+  </div>
+
+  <!-- 4 · Facilidades -->
+  <div class="slide" id="s4">
+    <div class="lbl">Passo 4 de 5</div>
+    <h2 class="ttl">Qual dessas facilidades é inegociável para você:</h2>
+    <p class="sub">Vamos priorizar o que mais importa no seu atendimento.</p>
+    <div class="og" id="og4">
+      <button class="ob" data-v="mar"><span class="ok">A</span>Proximidade com o mar<svg class="ock" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+      <button class="ob" data-v="aeroporto"><span class="ok">B</span>Acesso rápido ao aeroporto<svg class="ock" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+      <button class="ob" data-v="lazer_familia"><span class="ok">C</span>Lazer completo para a família<svg class="ock" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+      <button class="ob" data-v="todos"><span class="ok">D</span>Todos a cima!<svg class="ock" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+    </div>
+    <button class="bk" id="bk4"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Voltar</button>
+  </div>
+
+  <!-- 5 · Veículo FIPE -->
+  <div class="slide" id="s5">
+    <div class="lbl">Passo 5 de 5</div>
+    <h2 class="ttl">Você possui um veículo que gostaria de avaliar pela Tabela FIPE para facilitar sua entrada hoje?</h2>
+    <p class="sub">Aceitamos veículos como parte do pagamento da entrada.</p>
+    <div class="og" id="og5">
+      <button class="ob" data-v="sim_fipe"><span class="ok">A</span>Sim<svg class="ock" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+      <button class="ob" data-v="nao_fipe"><span class="ok">B</span>Não<svg class="ock" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+    </div>
+    <button class="bk" id="bk5"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Voltar</button>
+  </div>
+
+  <!-- 6 · Sucesso -->
+  <div class="slide" id="s6">
+    <div class="sw">
+      <div class="si">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2 class="st">Excelente escolha, <span id="nfinal">você</span>! 🏖️</h2>
+      <p class="ss">Recebi sua solicitação com prioridade.<br><br>Parabéns pelo seu interesse no seu futuro imóvel frente-mar! 🌊<br>Em instantes entrarei em contato para te enviar o material exclusivo com as melhores unidades e condições deste lançamento.</p>
+      <button class="bp" id="bwpp" style="margin:28px auto 0;display:inline-flex;">
+        <span class="bwpp-glass"></span>
+        <span class="bwpp-shine"></span>
+        <span class="bwpp-inner">
+          Falar no WhatsApp agora
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+        </span>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var WPP = '5547991530882';
+  var TOTAL = 5;
+  var cur = 0;
+  var fd = { nome:'', wpp:'', objetivo:'', facilidades:'', fipe:'' };
+
+  /* pixel seguro */
+  function px(ev, p){ try{ if(typeof fbq==='function') fbq('track',ev,p||{}); }catch(_){} }
+
+  /* elementos */
+  var pbar   = document.getElementById('pbar');
+  var sct    = document.getElementById('sct');
+  var fnome  = document.getElementById('fnome');
+  var fwpp   = document.getElementById('fwpp');
+  var ncc    = document.getElementById('ncc');
+
+  /* progress */
+  function prog(n){
+    pbar.style.width = (n===0?0:Math.round(n/TOTAL*100))+'%';
+    if(n>0&&n<=TOTAL){ sct.textContent=n+' / '+TOTAL; sct.classList.add('on'); }
+    else sct.classList.remove('on');
+  }
+
+  /* go */
+  function go(n, dir){
+    var fwd = dir!==undefined ? dir : (n>cur);
+    var out = document.getElementById('s'+cur);
+    var inp = document.getElementById('s'+n);
+    if(!out||!inp) return;
+
+    // prepare in
+    inp.style.transform = fwd ? 'translateX(50px)' : 'translateX(-50px)';
+    inp.style.opacity   = '0';
+    inp.style.position  = 'absolute';
+    inp.style.display   = 'block';
+    inp.style.pointerEvents = 'none';
+
+    void inp.offsetWidth; // reflow
+
+    // out
+    out.style.transition = 'opacity .28s,transform .28s';
+    out.style.opacity    = '0';
+    out.style.transform  = fwd ? 'translateX(-50px)' : 'translateX(50px)';
+
+    // in
+    inp.style.transition = 'opacity .38s,transform .38s';
+    inp.style.transform  = 'translateX(0)';
+    inp.style.opacity    = '1';
+
+    setTimeout(function(){
+      out.classList.remove('active');
+      out.removeAttribute('style');
+      inp.classList.add('active');
+      inp.removeAttribute('style');
+      cur = n;
+      prog(n);
+      var fi = inp.querySelector('input');
+      if(fi) setTimeout(function(){ fi.focus(); },60);
+    }, 350);
+  }
+
+  /* error shake */
+  function err(fid, mid){
+    var f=document.getElementById(fid), m=document.getElementById(mid);
+    f.classList.add('err');
+    if(m) m.classList.add('on');
+    f.animate([
+      {transform:'translateX(-7px)'},{transform:'translateX(7px)'},
+      {transform:'translateX(-4px)'},{transform:'translateX(4px)'},
+      {transform:'translateX(0)'}
+    ],{duration:360,easing:'ease-out'});
+    setTimeout(function(){ f.classList.remove('err'); if(m) m.classList.remove('on'); },2400);
+  }
+
+  /* char count */
+  fnome.addEventListener('input',function(){
+    var l=fnome.value.length;
+    ncc.textContent=l+'/60';
+    ncc.classList.toggle('warn',l>=55);
+  });
+
+  /* phone mask */
+  fwpp.addEventListener('input',function(e){
+    var r=e.target.value.replace(/\D/g,'').slice(0,11), v=r;
+    if(r.length>6)      v='('+r.slice(0,2)+') '+r.slice(2,7)+'-'+r.slice(7);
+    else if(r.length>2) v='('+r.slice(0,2)+') '+r.slice(2);
+    else if(r.length>0) v='('+r;
+    e.target.value=v;
+  });
+
+  /* step 1 */
+  function doNome(){
+    var v=fnome.value.trim();
+    if(!v){ err('fnome','enome'); return; }
+    fd.nome=v;
+    var f=v.split(' ')[0];
+    document.getElementById('nfinal').textContent=f;
+    px('Lead',{content_name:'passo_1_nome'});
+    go(2,true);
+  }
+
+  /* step 2 */
+  function doWpp(){
+    var r=fwpp.value.replace(/\D/g,'');
+    if(r.length<10){ err('fwpp','ewpp'); return; }
+    fd.wpp=fwpp.value;
+    px('Contact',{content_name:'passo_2_whatsapp'});
+    go(3,true);
+  }
+
+  /* options */
+  function bindOpts(gid, field, next){
+    var eventMap = {
+      'og3': 'passo_3_objetivo',
+      'og4': 'passo_4_facilidade',
+      'og5': 'passo_5_fipe'
+    };
+    var btns=document.getElementById(gid).querySelectorAll('.ob');
+    btns.forEach(function(b){
+      b.addEventListener('click',function(){
+        btns.forEach(function(x){ x.classList.remove('sel'); });
+        b.classList.add('sel');
+        fd[field]=b.dataset.v;
+        px('CustomizeProduct',{content_name: eventMap[gid], content_category: b.dataset.v});
+        if(next===6){ setTimeout(submit,320); }
+        else         { setTimeout(function(){ go(next,true); },300); }
+      });
+    });
+  }
+  bindOpts('og3','objetivo',4);
+  bindOpts('og4','facilidades',5);
+  bindOpts('og5','fipe',6);
+
+  /* submit */
+  function submit(){
+    px('CompleteRegistration',{content_name:'formulario_lead_imovel',status:true});
+    // fetch('https://seu-webhook.com',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(fd)});
+    console.log('Lead:',fd);
+    go(6,true);
+    setTimeout(confetti,450);
+  }
+
+  /* confetti */
+  function confetti(){
+    var cols=['#2563EB','#60A5FA','#BFDBFE','#FCD34D','#34D399','#F472B6','#A78BFA'];
+    for(var i=0;i<70;i++){
+      (function(i){
+        setTimeout(function(){
+          var d=document.createElement('div');
+          d.className='cf';
+          d.style.cssText=[
+            'left:'+Math.random()*100+'vw',
+            'top:-12px',
+            'width:'+(6+Math.random()*8)+'px',
+            'height:'+(5+Math.random()*7)+'px',
+            'background:'+cols[Math.floor(Math.random()*cols.length)],
+            'border-radius:'+(Math.random()>.5?'50%':'2px'),
+            'animation-duration:'+(1.1+Math.random()*1.9)+'s',
+          ].join(';');
+          document.body.appendChild(d);
+          setTimeout(function(){ d.remove(); },3600);
+        },i*25);
+      })(i);
+    }
+  }
+
+  /* bindings */
+  document.getElementById('b0').addEventListener('click',function(){ go(1,true); });
+  document.getElementById('b1').addEventListener('click',doNome);
+  document.getElementById('b2').addEventListener('click',doWpp);
+  document.getElementById('bk1').addEventListener('click',function(){ go(0,false); });
+  document.getElementById('bk2').addEventListener('click',function(){ go(1,false); });
+  document.getElementById('bk3').addEventListener('click',function(){ go(2,false); });
+  document.getElementById('bk4').addEventListener('click',function(){ go(3,false); });
+  document.getElementById('bk5').addEventListener('click',function(){ go(4,false); });
+  document.getElementById('bwpp').addEventListener('click',function(){
+    var objetivoMap = {
+      'moradia_exclusiva': 'Moradia exclusiva',
+      'investimento_rentabilidade': 'Investimento com alta rentabilidade'
+    };
+    var facilidadesMap = {
+      'mar': 'Proximidade com o mar',
+      'aeroporto': 'Acesso rápido ao aeroporto',
+      'lazer_familia': 'Lazer completo para a família',
+      'todos': 'Todos a cima!'
+    };
+    var fipeMap = {
+      'sim_fipe': 'Sim',
+      'nao_fipe': 'Não'
+    };
+    var msg = 'Novo investidor!\n\n'
+      + '*Nome* \u2014 ' + fd.nome + '\n'
+      + '*WhatsApp* \u2014 ' + fd.wpp + '\n'
+      + '*Objetivo* \u2014 ' + (objetivoMap[fd.objetivo] || fd.objetivo) + '\n'
+      + '*Facilidade inegoci\u00e1vel* \u2014 ' + (facilidadesMap[fd.facilidades] || fd.facilidades) + '\n'
+      + '*Avalia\u00e7\u00e3o FIPE* \u2014 ' + (fipeMap[fd.fipe] || fd.fipe);
+    window.open('https://wa.me/'+WPP+'?text='+encodeURIComponent(msg),'_blank');
+  });
+
+  fnome.addEventListener('keydown',function(e){ if(e.key==='Enter') doNome(); });
+  fwpp.addEventListener('keydown', function(e){ if(e.key==='Enter') doWpp(); });
+
+  /* keyboard shortcuts A/B/C/D */
+  document.addEventListener('keydown',function(e){
+    if(e.target.tagName==='INPUT') return;
+    var m={a:0,b:1,c:2,d:3}, k=e.key.toLowerCase();
+    if(!(k in m)) return;
+    var sl=document.getElementById('s'+cur);
+    if(!sl) return;
+    var opts=sl.querySelectorAll('.ob');
+    if(opts[m[k]]) opts[m[k]].click();
+  });
+
+  /* init */
+  prog(0);
+})();
+</script>
+</body>
+</html>
